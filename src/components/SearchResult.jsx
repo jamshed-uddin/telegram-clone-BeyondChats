@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import ChatsList from "./ChatsList";
 
 const allTabs = [
   { id: 1, name: "Chats" },
@@ -16,8 +17,8 @@ const SearchResult = ({ chats }) => {
   return (
     <div>
       {/* tabs */}
-      <div className="overflow-x-auto hide-scrollbar">
-        <div className="flex items-center gap-8 flex-nowrap text-lg font-semibold border-b border-b-gray-300">
+      <div className="overflow-x-auto hide-scrollbar  border-b border-b-gray-300">
+        <div className="flex items-center gap-8 flex-nowrap text-lg font-semibold ">
           {allTabs?.map((singleTab) => (
             <div
               className={`py-2 cursor-pointer  ${
@@ -36,15 +37,7 @@ const SearchResult = ({ chats }) => {
 
       {/* search result */}
 
-      <div className="h-max">
-        {chats?.map((chat) => (
-          <div className="border border-black py-4" key={chat?.id}>
-            <Link to={`/chat/${chat?.created_by}/${chat?.id}`}>
-              <div>{chat?.creator?.name || "Deleted Account"}</div>
-            </Link>
-          </div>
-        ))}
-      </div>
+      <ChatsList chats={chats} />
     </div>
   );
 };

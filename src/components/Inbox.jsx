@@ -10,9 +10,14 @@ import useData from "../hooks/useData";
 
 const Inbox = () => {
   const { chatCreator, id } = useParams();
-  const { getSingleChat } = useData();
+  const {
+    getSingleChat,
+    profileInfoOpened,
+    setProfileInfoOpened,
+    getPinnedMessage,
+  } = useData();
   const [messages, setMessages] = useState([]);
-  const [openInfo, setOpenInfo] = useState(false);
+  const [pinnedMessage, setPinnedMessage] = useState({});
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -28,38 +33,35 @@ const Inbox = () => {
 
   const singleChat = getSingleChat(id);
 
-  console.log(singleChat);
+  useEffect(() => {
+    const pinnedMessage = getPinnedMessage({ id, messages });
 
+    setPinnedMessage(pinnedMessage);
+  }, [getPinnedMessage, id, messages]);
+
+  console.log(pinnedMessage);
   return (
     <div className="w-full h-full relative flex flex-col ">
       <div className="bg-gradient-to-br from-[#8DBA86] via-[#CDD58E] to-[#71A888] absolute inset-0 -z-20"></div>
 
       {/* inbox header */}
       <div>
-        <InboxHeader setOpenInfo={setOpenInfo} creator={singleChat?.creator} />
+        <InboxHeader setOpenInfo={setProfileInfoOpened} chat={singleChat} />
       </div>
 
       {/* messages */}
-      <div className="flex flex-grow   overflow-y-auto hide-scrollbar h-full">
-        <div className="  px-2 lg:px-0  lg:w-[60%] mx-auto ">
-          <div className="">
+      <div className="flex flex-grow   overflow-y-auto hide-scrollbar h-full w-full px-1">
+        <div className="  px-2 lg:px-0 w-full lg:max-w-[30rem]  mx-auto  ">
+          <div className="w-full">
             <Messages messages={messages} />
           </div>
-        </div>
-
-        <div
-          className={`sticky top-0 right-0 transition-all duration-300 overflow-hidden bg-white ${
-            openInfo ? "w-64" : "w-0"
-          }`}
-        >
-          info
         </div>
       </div>
 
       {/* message input */}
       <div
-        className={`    w-full lg:w-[60%] ${
-          openInfo
+        className={`    w-full lg:max-w-[30rem]  mx-auto ${
+          profileInfoOpened
             ? "ml-8  transition-all duration-300"
             : "mx-auto  transition-all duration-300"
         }`}

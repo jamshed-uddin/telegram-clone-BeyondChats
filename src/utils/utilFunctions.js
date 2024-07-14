@@ -38,6 +38,12 @@ const isYesterday = (messageDate) => {
   return yesterday;
 };
 
+const isCurrentYear = (messageDate) => {
+  const currentDate = new Date();
+
+  return currentDate.getFullYear() === messageDate.getFullYear();
+};
+
 export const chatDate = (messageDateRaw) => {
   const messageDate = new Date(messageDateRaw);
 
@@ -50,6 +56,10 @@ export const chatDate = (messageDateRaw) => {
     return clockTime.startsWith("0") ? clockTime.slice(1) : clockTime;
   } else if (isYesterday(messageDate)) {
     return "YesterDay";
+  } else if (isCurrentYear(messageDate)) {
+    const day = messageDate.getDate();
+    const month = messageDate.toLocaleString("default", { month: "long" });
+    return `${month} ${day}`;
   } else {
     const day = messageDate.getDate();
     const month = messageDate.toLocaleString("default", { month: "long" });
@@ -70,15 +80,15 @@ export const messageDate = (rawDate) => {
 
 export const generateAvatarColor = (userId) => {
   const colors = [
-    "#FFD5D5",
-    "#D1FAE5",
-    "#BFDBFE",
-    "#FEEBC8",
-    "#E9D5FF",
-    "#FECACA",
-    "#D1FAE5",
-    "#BFDBFE",
-    "#FEEBC8",
+    "#66CCCC",
+    "#669933",
+    "#FFCC00",
+    "#339966",
+    "#9966CC",
+    "#FF9900",
+    "#336699",
+    "#FF6666",
+    "#CCCC66",
   ];
 
   const index = userId % colors.length;

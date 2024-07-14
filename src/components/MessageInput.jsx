@@ -18,7 +18,7 @@ const MessageInput = () => {
   }, [messageText]);
 
   return (
-    <div className=" mb-4 w-full chat chat-end flex items-end">
+    <div className="px-1 lg:mb-4 w-full chat chat-end flex items-end">
       <div className="bg-white flex gap-2 items-end w-full  chat-bubble">
         <div className="opacity-70 mb-1.5">
           <SlEmotsmile size={20} color="black" />

@@ -5,6 +5,7 @@ import {
   messageDate,
   messageTime,
 } from "../utils/utilFunctions";
+import MessageCard from "./MessageCard";
 
 const Messages = ({ messages, chatCreator }) => {
   const [messageGroup, setMessageGroup] = useState({});
@@ -33,7 +34,7 @@ const Messages = ({ messages, chatCreator }) => {
   console.log(messageGroup);
 
   return (
-    <div className="space-y-1.5 h-max ">
+    <div className="space-y-1.5 h-max w-full ">
       {Object.keys(messageGroup).map((date) => (
         <div key={date}>
           <div className="flex justify-center sticky top-1 left-0 right-0 z-20">
@@ -46,13 +47,13 @@ const Messages = ({ messages, chatCreator }) => {
 
           {messages?.map((message, index, messages) => (
             <div
-              className={` flex w-full  chat ${
+              className={` flex chat ${
                 isOwnMessage(chatCreator, message)
                   ? isUsersLastMessage(message, index, messages)
-                    ? "   chat-end"
+                    ? "chat-end"
                     : ""
                   : isUsersLastMessage(message, index, messages)
-                  ? " chat-start"
+                  ? "chat-start"
                   : ""
               }`}
               key={message.id}
@@ -61,19 +62,14 @@ const Messages = ({ messages, chatCreator }) => {
                 className={`text-wrap leading-6 p-1 text-black chat-bubble ${
                   isOwnMessage(chatCreator, message)
                     ? isUsersLastMessage(message, index, messages)
-                      ? "ml-4  bg-[#E3FEE0]"
-                      : "ml-4 bg-[#E3FEE0] rounded-xl "
+                      ? "ml-auto  bg-[#E3FEE0]"
+                      : "ml-auto bg-[#E3FEE0] rounded-xl "
                     : isUsersLastMessage(message, index, messages)
-                    ? "mr-4 bg-white"
-                    : "mr-4 bg-white rounded-xl "
+                    ? "mr-auto bg-white"
+                    : "mr-auto bg-white rounded-xl "
                 }`}
               >
-                <h5 className="rounded-xl overflow-hidden text-wrap">
-                  {message.message}
-                </h5>
-                <h6 className="text-xs text-end ml-7 mr-1 leading-3">
-                  {messageTime(message.created_at)}
-                </h6>
+                <MessageCard message={message} />
               </div>
             </div>
           ))}

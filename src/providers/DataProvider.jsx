@@ -6,29 +6,55 @@ const pinnedMessagesKey = "pinnedMessages";
 const themeKey = "theme";
 const DataProvider = ({ children }) => {
   const [chats, setChats] = useState([]);
+  const [profileInfoOpened, setProfileInfoOpened] = useState(false);
 
   // pinnedMessage state
-  const [pinnedMessages, setPinnedMessage] = useState(() => {
+  const [pinnedMessages, setPinnedMessages] = useState(() => {
     const existingMessage = localStorage.getItem(pinnedMessagesKey);
 
     return existingMessage ? JSON.parse(existingMessage) : [];
   });
-
+  console.log(pinnedMessages);
   // theme state
   const [theme, setTheme] = useState(
     localStorage.getItem(themeKey) ? localStorage.getItem(themeKey) : "light"
   );
 
   const [chatsLoading, setChatsLoading] = useState(false);
+  const [chatsError, setChatsError] = useState("");
 
   useEffect(() => {
     const loadChats = async () => {
-      const allChats = await axios.get(
-        "https://devapi.beyondchats.com/api/get_all_chats?page=1"
-      );
+      try {
+        const result = await axios.get(
+          "https://devapi.beyondchats.com/api/get_all_chats?page=1"
+        );
 
-      console.log(allChats?.data?.data.data);
-      setChats(allChats?.data?.data.data);
+        const allChats = result?.data?.data.data;
+        //There is no latestMessage field in the chat object. fetched messages of each chat and set the last message to the created latestMessage field.It's neccessary to sort chats based on latestMessage and last message time.
+        const updatedChats = await Promise.all(
+          allChats?.map(async (chat) => {
+            const { data } = await axios.get(
+              `https://devapi.beyondchats.com/api/get_chat_messages?chat_id=${chat?.id}`
+            );
+            const messagesResult = data?.data;
+            console.log(messagesResult);
+            const latestMessage =
+              messagesResult?.length > 0 ? messagesResult?.at(-1) : null;
+
+            return {
+              ...chat,
+              latestMessage,
+            };
+          })
+        );
+
+        setChats(updatedChats);
+        // setChats(allChats);
+      } catch (error) {
+        console.log(error);
+        setChatsError("Something went wrong!");
+      }
     };
 
     loadChats();
@@ -52,38 +78,43 @@ const DataProvider = ({ children }) => {
   // get pinned message of specific chat
   const getPinnedMessage = ({ chatId, messages }) => {
     const chatsPinnedMessage = pinnedMessages.find(
-      (pin) => pin.chatId == chatId
+      (pin) => pin.chatId === chatId
     );
-
+    console.log(chatsPinnedMessage);
     if (chatsPinnedMessage) {
       const message = messages?.find(
-        (message) => message.id == chatsPinnedMessage.messageId
+        (message) => message.id === chatsPinnedMessage.messageId
       );
+      console.log(message);
       return message;
     }
   };
 
-  // pin a message
   const pinMessage = ({ chatId, messageId }) => {
-    setPinnedMessage((prev) => {
-      const existingMessageId = prev.findIndex(
-        (pin) => pin.chatId == chatId && pin.messageId == messageId
+    setPinnedMessages((prevMessages) => {
+      const existingMessageIndex = prevMessages.findIndex(
+        (message) => message.chatId === chatId
       );
-
-      if (existingMessageId != 1) {
-        const updatedMessages = [...prev];
-
-        updatedMessages.at(existingMessageId).messageId = messageId;
+      if (existingMessageIndex !== -1) {
+        const updatedMessages = [...prevMessages];
+        updatedMessages[existingMessageIndex].messageId = messageId;
         return updatedMessages;
       } else {
-        return [...prev, { messageId, chatId }];
+        return [...prevMessages, { chatId, messageId }];
       }
     });
   };
 
-  // unpin message
   const unpinMessage = (chatId) => {
-    setPinnedMessage((prev) => prev.filter((pin) => pin.chatId != chatId));
+    setPinnedMessages((prevMessages) =>
+      prevMessages.filter((message) => message.chatId !== chatId)
+    );
+  };
+
+  const isPinned = (messageId) => {
+    const pinned = pinnedMessages?.find((pin) => pin.messageId === messageId);
+
+    return pinned ? true : false;
   };
 
   // get single chat data
@@ -101,8 +132,11 @@ const DataProvider = ({ children }) => {
     getPinnedMessage,
     pinMessage,
     unpinMessage,
+    isPinned,
     dark: theme === "dark",
     toggleTheme,
+    profileInfoOpened,
+    setProfileInfoOpened,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

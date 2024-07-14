@@ -1,14 +1,16 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { isOwnMessage, isUsersLastMessage } from "../utils/utilFunctions";
-import { IoEllipsisVerticalSharp } from "react-icons/io5";
-import { SlMagnifier } from "react-icons/sl";
-import { BsTelephone } from "react-icons/bs";
+import { isOwnMessage } from "../utils/utilFunctions";
+
+import Messages from "./Messages";
+import MessageInput from "./MessageInput";
+import InboxHeader from "./InboxHeader";
+import useData from "../hooks/useData";
 
 const Inbox = () => {
   const { chatCreator, id } = useParams();
-
+  const { getSingleChat } = useData();
   const [messages, setMessages] = useState([]);
   const [openInfo, setOpenInfo] = useState(false);
 
@@ -18,70 +20,51 @@ const Inbox = () => {
         `https://devapi.beyondchats.com/api/get_chat_messages?chat_id=${id}`
       );
 
-      console.log(allMessages?.data?.data);
       setMessages(allMessages?.data?.data);
     };
 
     loadMessages();
   }, [id]);
 
-  console.log(isOwnMessage(chatCreator, messages.at(1)));
+  const singleChat = getSingleChat(id);
+
+  console.log(singleChat);
 
   return (
-    <div className="w-full h-full">
-      <div className="py-1.5 px-4 shadow-sm flex justify-between items-center">
-        <div className="flex items-center gap-5 ">
-          <div
-            onClick={() => setOpenInfo((p) => !p)}
-            className="w-11 h-11 rounded-full bg-green-300 cursor-pointer"
-          ></div>
-          <h1 className="font-semibold text-lg">User name</h1>
-        </div>
-        <div className="flex items-center gap-8">
-          <span className="cursor-pointer">
-            <BsTelephone size={20} />
-          </span>
-          <span className="cursor-pointer">
-            <SlMagnifier size={20} />
-          </span>
-          <span className="cursor-pointer">
-            <IoEllipsisVerticalSharp size={20} />
-          </span>
-        </div>
+    <div className="w-full h-full relative flex flex-col ">
+      <div className="bg-gradient-to-br from-[#8DBA86] via-[#CDD58E] to-[#71A888] absolute inset-0 -z-20"></div>
+
+      {/* inbox header */}
+      <div>
+        <InboxHeader setOpenInfo={setOpenInfo} creator={singleChat?.creator} />
       </div>
-      <div className="flex h-[calc(100%-4rem)] bg-gradient-to-br from-[#8DBA86] via-[#CDD58E] to-[#71A888]">
-        <div className="overflow-y-auto h-full px-2 lg:px-0  lg:w-2/3 mx-auto">
-          <div className="space-y-1.5 h-max ">
-            {messages?.map((message, index, messages) => (
-              <div className={` flex w-full `} key={message.id}>
-                <div
-                  className={` leading-6 p-1  ${
-                    isOwnMessage(chatCreator, message)
-                      ? isUsersLastMessage(message, index, messages)
-                        ? "ml-4  bg-[#E3FEE0] rounded-tl-xl rounded-tr-xl rounded-bl-xl"
-                        : "ml-4 bg-[#E3FEE0] rounded-xl "
-                      : isUsersLastMessage(message, index, messages)
-                      ? "mr-4 bg-white rounded-tl-xl rounded-tr-xl rounded-br-xl"
-                      : "mr-4 bg-white rounded-xl "
-                  }`}
-                >
-                  {message.message}
-                </div>
-              </div>
-            ))}
+
+      {/* messages */}
+      <div className="flex flex-grow   overflow-y-auto hide-scrollbar h-full">
+        <div className="  px-2 lg:px-0  lg:w-[60%] mx-auto ">
+          <div className="">
+            <Messages messages={messages} />
           </div>
         </div>
 
         <div
-          className={` transition-all duration-300 overflow-hidden bg-white ${
+          className={`sticky top-0 right-0 transition-all duration-300 overflow-hidden bg-white ${
             openInfo ? "w-64" : "w-0"
           }`}
         >
           info
         </div>
       </div>
-      <div>
-        <h1>send message</h1>
+
+      {/* message input */}
+      <div
+        className={`    w-full lg:w-[60%] ${
+          openInfo
+            ? "ml-8  transition-all duration-300"
+            : "mx-auto  transition-all duration-300"
+        }`}
+      >
+        <MessageInput />
       </div>
     </div>
   );

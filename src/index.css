@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-::-webkit-scrollbar {
-  display: none;
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-
-/* :hover::-webkit-scrollbar-thumb {
-  background-color: rgba(220, 220, 220, 0.776);
-  border-radius: 10px;
-} */
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

@@ -10,13 +10,29 @@ import useData from "../hooks/useData";
 const ChatsBar = () => {
   const { chats } = useData();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const result = chats?.filter((chat) =>
+      chat.creator?.name?.toLowerCase().includes(searchQuery?.toLowerCase())
+    );
+
+    setSearchResult(result);
+  }, [chats, searchQuery]);
+
+  const navigateBack = () => {
+    setIsSearchOpen(false);
+    setSearchQuery("");
+    setSearchResult([]);
+  };
 
   return (
     <div className="flex flex-col h-full relative">
       <div className="flex items-center gap-6 mb-3 sticky top-2 right-0 left-0 bg-white shadow-sm px-5 pb-2">
         <button>
           {isSearchOpen ? (
-            <span onClick={() => setIsSearchOpen(false)}>
+            <span onClick={navigateBack}>
               <HiOutlineArrowLeft size={20} />
             </span>
           ) : (
@@ -29,12 +45,18 @@ const ChatsBar = () => {
           <input
             type="text"
             className="input h-10 input-bordered focus:border-2 focus:border-blue-500 focus:outline-0 w-full text-lg rounded-3xl transition-all duration-150 "
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchOpen(true)}
           />
         </div>
       </div>
       <div className="flex-grow px-5 ">
-        {isSearchOpen ? <SearchResult /> : <ChatsList chats={chats} />}
+        {isSearchOpen ? (
+          <SearchResult chats={searchResult} />
+        ) : (
+          <ChatsList chats={chats} />
+        )}
       </div>
     </div>
   );

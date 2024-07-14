@@ -4,6 +4,7 @@ import { BsTelephone } from "react-icons/bs";
 import { HiXMark } from "react-icons/hi2";
 import { IoCalendarClearOutline } from "react-icons/io5";
 import { useState } from "react";
+import { generateAvatarColor } from "../utils/utilFunctions";
 
 const InboxHeader = ({ setOpenInfo, creator }) => {
   const [isSearchbarOpen, setIsSearchbarOpen] = useState(false);
@@ -39,9 +40,14 @@ const InboxHeader = ({ setOpenInfo, creator }) => {
       <div className="flex items-center gap-5 ">
         <div
           onClick={() => setOpenInfo((p) => !p)}
-          className="w-11 h-11 rounded-full bg-green-300 cursor-pointer"
-        ></div>
-        <h1 className="font-semibold text-lg">{creator.name || "User name"}</h1>
+          className={`w-11 h-11 rounded-full cursor-pointer flex items-center justify-center text-2xl font-bold text-black`}
+          style={{ backgroundColor: generateAvatarColor(creator?.id) }}
+        >
+          {creator?.name?.slice(0, 1)?.toUpperCase()}
+        </div>
+        <h1 className="font-semibold text-lg">
+          {creator?.name || "User name"}
+        </h1>
       </div>
       <div className="flex items-center gap-8">
         <span className="cursor-pointer">

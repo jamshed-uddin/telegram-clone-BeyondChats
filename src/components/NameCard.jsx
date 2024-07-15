@@ -4,7 +4,7 @@ import useData from "../hooks/useData";
 
 const NameCard = ({ placedIn, chat }) => {
   const { profileInfoOpened, setProfileInfoOpened } = useData();
-
+  console.log(chat);
   return (
     <div
       className={`flex items-center py-0.5  ${
@@ -49,8 +49,11 @@ const NameCard = ({ placedIn, chat }) => {
           }`}
         >
           <span className={`${placedIn === "rightSidebar" && "text-2xl"}`}>
-            {" "}
-            {chat?.creator?.name || "Deleted Account"}
+            {chat
+              ? chat?.creator?.name
+                ? chat?.creator?.name
+                : "Deleted Account"
+              : ""}
           </span>
           {placedIn === "chatsList" && (
             <span className="text-xs font-normal">

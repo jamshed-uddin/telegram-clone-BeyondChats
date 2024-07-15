@@ -8,6 +8,7 @@ const DataProvider = ({ children }) => {
   const [chats, setChats] = useState([]);
   const [profileInfoOpened, setProfileInfoOpened] = useState(false);
   const [openInbox, setOpenInbox] = useState(false);
+  const [leftMenuOpened, setLeftMenuOpened] = useState(false);
   // pinnedMessage state
   const [pinnedMessages, setPinnedMessages] = useState(() => {
     const existingMessage = localStorage.getItem(pinnedMessagesKey);
@@ -39,7 +40,7 @@ const DataProvider = ({ children }) => {
               `https://devapi.beyondchats.com/api/get_chat_messages?chat_id=${chat?.id}`
             );
             const messagesResult = data?.data;
-            console.log(messagesResult);
+
             const latestMessage =
               messagesResult?.length > 0 ? messagesResult?.at(-1) : null;
 
@@ -111,8 +112,6 @@ const DataProvider = ({ children }) => {
     return singleChat;
   };
 
-  console.log(theme);
-
   const value = {
     chats,
     getSingleChat,
@@ -128,6 +127,8 @@ const DataProvider = ({ children }) => {
     setProfileInfoOpened,
     openInbox,
     setOpenInbox,
+    leftMenuOpened,
+    setLeftMenuOpened,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -1,7 +1,6 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { isOwnMessage } from "../utils/utilFunctions";
 
 import Messages from "./Messages";
 import MessageInput from "./MessageInput";
@@ -16,11 +15,17 @@ const Inbox = () => {
     profileInfoOpened,
     setProfileInfoOpened,
     pinnedMessages,
+    dark,
   } = useData();
   const [messages, setMessages] = useState([]);
   const [pinnedMessage, setPinnedMessage] = useState({});
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [messagesError, setMessageError] = useState("");
+  const messageRef = useRef({});
+  const messageContainerRef = useRef(null);
+  const singleChat = getSingleChat(id);
+
+  // fetch messages
   useEffect(() => {
     const loadMessages = async () => {
       try {
@@ -41,31 +46,59 @@ const Inbox = () => {
     loadMessages();
   }, [id]);
 
-  const singleChat = getSingleChat(id);
+  useEffect(() => {
+    const chatsPinnedMessage = pinnedMessages?.find((pin) => pin.chatId == id);
+
+    const pinned = messages?.find(
+      (message) => message?.id == chatsPinnedMessage?.messageId
+    );
+
+    setPinnedMessage(pinned);
+  }, [id, messages, pinnedMessages]);
 
   useEffect(() => {
-    const pinnedMessage = pinnedMessages?.find((pin) => pin.chatId === id);
+    const containerRef = messageContainerRef.current;
 
-    setPinnedMessage(pinnedMessage);
-  }, [id, messages, pinnedMessages]);
+    if (containerRef) {
+      containerRef.scrollTop = containerRef.scrollHeight;
+    }
+  });
 
   return (
     <div className="w-full h-full relative flex flex-col ">
-      <div className="bg-gradient-to-br from-[#8DBA86] via-[#CDD58E] to-[#71A888] absolute inset-0 -z-20"></div>
+      <div
+        className={`${
+          dark
+            ? "bg-gray-900"
+            : "bg-gradient-to-br from-[#8DBA86] via-[#CDD58E] to-[#71A888]"
+        } absolute inset-0 -z-20`}
+      ></div>
 
       {/* inbox header */}
       <div>
-        <InboxHeader setOpenInfo={setProfileInfoOpened} chat={singleChat} />
+        <InboxHeader
+          setOpenInfo={setProfileInfoOpened}
+          chat={singleChat}
+          pinnedMessage={pinnedMessage}
+          pinnedMessageRef={messageRef}
+        />
       </div>
 
       {/* messages */}
-      <div className="flex flex-grow   overflow-y-auto hide-scrollbar h-full w-full px-1">
+      <div
+        ref={messageContainerRef}
+        className="flex flex-grow   overflow-y-auto hide-scrollbar h-full w-full px-1"
+      >
         <div className="  px-2 lg:px-0 w-full lg:max-w-[30rem]  mx-auto  ">
           <div className="w-full">
             {messagesLoading ? (
               <InboxSkeleton />
+            ) : messagesError ? (
+              <div>
+                <h4 className="text-center">{messagesError}</h4>
+              </div>
             ) : (
-              <Messages messages={messages} />
+              <Messages messages={messages} messagesRef={messageRef} />
             )}
           </div>
         </div>
@@ -79,7 +112,7 @@ const Inbox = () => {
             : "mx-auto  transition-all duration-300"
         }`}
       >
-        <MessageInput />
+        <MessageInput setMessages={setMessages} />
       </div>
     </div>
   );

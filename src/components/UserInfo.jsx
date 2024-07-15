@@ -7,16 +7,18 @@ import { IoMailOpenOutline } from "react-icons/io5";
 import useData from "../hooks/useData";
 import NameCard from "./NameCard";
 import { useLocation } from "react-router-dom";
+import { useState } from "react";
 const UserInfo = () => {
   const { getSingleChat, profileInfoOpened, setProfileInfoOpened } = useData();
   const { pathname } = useLocation();
-  console.log(pathname?.split("/").at(3));
+  const [profileTab, setProfileTab] = useState("media");
+
   const chat = getSingleChat(pathname?.split("/").at(3));
 
-  console.log(chat);
   const contactStyle = "flex items-center gap-8 text-lg  leading-6 w-full";
   return (
-    <div className="px-7 border-l border-r-gray-300">
+    <div className="lg:px-7 px-4 ">
+      {/* close userinfo buttons */}
       <div className="flex items-center py-4 ">
         <button onClick={() => setProfileInfoOpened(false)} className="">
           <HiXMark size={25} />
@@ -26,9 +28,13 @@ const UserInfo = () => {
           <LuPencil size={20} />
         </button>
       </div>
+
+      {/* image name */}
       <div className="mt-8">
         <NameCard chat={chat} placedIn={"rightSidebar"} />
       </div>
+
+      {/* contact info */}
       <div className="space-y-4 mt-12">
         <h3 className={contactStyle}>
           <span>
@@ -63,6 +69,28 @@ const UserInfo = () => {
             </span>
           </span>
         </h3>
+      </div>
+
+      {/* media and link tab */}
+      <div className="mt-4 ">
+        <h2
+          className="flex gap-12 items-center text-center justify-between border-b  text-lg font-semibold border-gray-300 
+        "
+        >
+          {["Media", "Links"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setProfileTab(tab.toLowerCase())}
+              className={`text-center flex-grow  py-2 ${
+                tab.toLowerCase() === profileTab.toLowerCase()
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-black border-b-2 border-transparent"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </h2>
       </div>
     </div>
   );

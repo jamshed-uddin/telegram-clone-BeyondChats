@@ -6,11 +6,13 @@ import Chatpage from "./components/Chatpage.jsx";
 import Inbox from "./components/Inbox.jsx";
 import InboxHome from "./components/InboxHome.jsx";
 import DataProvider from "./providers/DataProvider.jsx";
+import NotFoundPage from "./NotFoundPage.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Chatpage />,
+    errorElement: <NotFoundPage />,
     children: [
       { path: "/", element: <InboxHome /> },
       {

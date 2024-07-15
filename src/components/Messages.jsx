@@ -6,10 +6,11 @@ import {
   messageTime,
 } from "../utils/utilFunctions";
 import MessageCard from "./MessageCard";
+import useData from "../hooks/useData";
 
-const Messages = ({ messages, chatCreator }) => {
+const Messages = ({ messages, chatCreator, messagesRef }) => {
   const [messageGroup, setMessageGroup] = useState({});
-
+  const { dark } = useData();
   useEffect(() => {
     const messageDate = (messageDate) =>
       new Date(messageDate).toLocaleDateString("en-IN", {
@@ -57,11 +58,16 @@ const Messages = ({ messages, chatCreator }) => {
               key={message.id}
             >
               <div
-                className={`text-wrap leading-6 p-1 text-black chat-bubble ${
+                ref={(el) => (messagesRef.current[message?.id] = el)}
+                className={`text-wrap leading-6 p-1 text-black chat-bubble  ${
                   isOwnMessage(chatCreator, message)
                     ? isUsersLastMessage(message, index, messages)
-                      ? "ml-auto  bg-[#E3FEE0]"
-                      : "ml-auto bg-[#E3FEE0] rounded-xl "
+                      ? dark
+                        ? "secondary-bg ml-auto text-white"
+                        : "ml-auto  bg-[#E3FEE0] text-black"
+                      : dark
+                      ? "ml-auto secondary-bg rounded-xl text-white"
+                      : "ml-auto bg-[#E3FEE0] rounded-xl text-black"
                     : isUsersLastMessage(message, index, messages)
                     ? "mr-auto bg-white"
                     : "mr-auto bg-white rounded-xl "

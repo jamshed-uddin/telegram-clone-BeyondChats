@@ -10,11 +10,11 @@ import useData from "../hooks/useData";
 
 const MessageCard = ({ message }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { pinMessage, isPinned, unpinMessage } = useData();
+  const { pinMessage, isPinned, unpinMessage, dark } = useData();
 
   const handleContextMenu = (e) => {
     e.preventDefault();
-    console.log("hello");
+
     setMenuOpen(true);
   };
 
@@ -38,8 +38,9 @@ const MessageCard = ({ message }) => {
     }
   };
 
-  const buttonStyle =
-    "flex items-center gap-6  font-semiboldw-full pr-7 rounded-lg hover:bg-gray-200 transition-all duration-100 px-2 font-medium";
+  const buttonStyle = `flex items-center gap-6  font-semiboldw-full pr-7 rounded-lg ${
+    dark ? "hover:bg-gray-800" : "hover:bg-gray-50"
+  } transition-all duration-100 px-2 font-medium`;
   return (
     <div
       onClick={openMenuByClick}
@@ -55,7 +56,11 @@ const MessageCard = ({ message }) => {
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
         >
-          <div className=" px-4 py-3 rounded-xl flex flex-col space-y-2 bg-gray-100">
+          <div
+            className={`px-3 py-3 rounded-xl flex flex-col space-y-2 ${
+              dark ? "bg-gray-900 text-white " : " bg-gray-100"
+            }`}
+          >
             <button className={buttonStyle}>
               <span>
                 <BsReply size={20} />
@@ -72,7 +77,7 @@ const MessageCard = ({ message }) => {
               {isPinned(message.id) ? (
                 <>
                   <span>
-                    <VscPinnedDirty size={20} />
+                    <TbPinnedOff size={20} />
                   </span>
                   <span>Unpin</span>{" "}
                 </>
@@ -88,9 +93,9 @@ const MessageCard = ({ message }) => {
             </button>
             <button className={buttonStyle}>
               <span>
-                <AiOutlineDelete size={20} />
+                <AiOutlineDelete size={20} color={"red"} />
               </span>
-              <span>Delete</span>
+              <span className="text-red-500">Delete</span>
             </button>
           </div>
         </ContextMenu>

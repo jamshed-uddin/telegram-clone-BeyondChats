@@ -10,7 +10,7 @@ import SearchResult from "./SearchResult";
 import useData from "../hooks/useData";
 
 const ChatsBar = () => {
-  const { chats } = useData();
+  const { chats, chatsLoading, chatsError } = useData();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,12 +37,9 @@ const ChatsBar = () => {
     setSearchResult([]);
   };
 
-  console.log(searchResult);
-  console.log(searchQuery);
-
   return (
     <div className="flex flex-col h-full relative border-r border-r-gray-300">
-      <div className="flex items-center gap-5 mb-3 sticky top-0 right-0 left-0 bg-white shadow-sm px-6 py-2">
+      <div className="flex items-center gap-5 mb-3 sticky top-0 right-0 left-0 bg-white shadow-sm px-4 lg:px-6 py-2">
         <button>
           {isSearchOpen ? (
             <span onClick={navigateBack}>
@@ -77,11 +74,15 @@ const ChatsBar = () => {
           />
         </div>
       </div>
-      <div className="flex-grow px-4 ">
+      <div className="flex-grow px-2 lg:px-4 ">
         {isSearchOpen ? (
           <SearchResult chats={searchResult} />
         ) : (
-          <ChatsList chats={chats} />
+          <ChatsList
+            chats={chats}
+            chatsLoading={chatsLoading}
+            chatsError={chatsError}
+          />
         )}
       </div>
     </div>

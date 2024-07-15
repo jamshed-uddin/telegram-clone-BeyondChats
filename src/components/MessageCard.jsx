@@ -10,7 +10,7 @@ import useData from "../hooks/useData";
 
 const MessageCard = ({ message }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { pinUnpinMessage, isPinned } = useData();
+  const { pinMessage, isPinned, unpinMessage } = useData();
 
   const handleContextMenu = (e) => {
     e.preventDefault();
@@ -26,12 +26,16 @@ const MessageCard = ({ message }) => {
   };
 
   const handlePinUnpin = () => {
-    pinUnpinMessage({
-      chatId: message?.chat_id,
-      messageId: message?.id,
-    });
-
-    setMenuOpen(false);
+    if (isPinned(message.id)) {
+      setMenuOpen(false);
+      return unpinMessage(message.chat_id);
+    } else {
+      setMenuOpen(false);
+      return pinMessage({
+        chatId: message?.chat_id,
+        messageId: message?.id,
+      });
+    }
   };
 
   const buttonStyle =

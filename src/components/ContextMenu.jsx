@@ -18,7 +18,7 @@ const ContextMenu = ({
         contextMenuRef.current &&
         !contextMenuRef.current.contains(e.target)
       ) {
-        setMenuOpen(false);
+        setMenuOpen((p) => !p);
       }
     };
 

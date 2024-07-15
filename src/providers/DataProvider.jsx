@@ -7,14 +7,14 @@ const themeKey = "theme";
 const DataProvider = ({ children }) => {
   const [chats, setChats] = useState([]);
   const [profileInfoOpened, setProfileInfoOpened] = useState(false);
-
+  const [openInbox, setOpenInbox] = useState(false);
   // pinnedMessage state
   const [pinnedMessages, setPinnedMessages] = useState(() => {
     const existingMessage = localStorage.getItem(pinnedMessagesKey);
 
     return existingMessage ? JSON.parse(existingMessage) : [];
   });
-  console.log(pinnedMessages);
+
   // theme state
   const [theme, setTheme] = useState(
     localStorage.getItem(themeKey) ? localStorage.getItem(themeKey) : "light"
@@ -26,6 +26,7 @@ const DataProvider = ({ children }) => {
   useEffect(() => {
     const loadChats = async () => {
       try {
+        setChatsLoading(true);
         const result = await axios.get(
           "https://devapi.beyondchats.com/api/get_all_chats?page=1"
         );
@@ -50,9 +51,10 @@ const DataProvider = ({ children }) => {
         );
 
         setChats(updatedChats);
+        setChatsLoading(false);
         // setChats(allChats);
       } catch (error) {
-        console.log(error);
+        setChatsLoading(false);
         setChatsError("Something went wrong!");
       }
     };
@@ -73,21 +75,6 @@ const DataProvider = ({ children }) => {
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
-
-  // get pinned message of specific chat
-  const getPinnedMessage = ({ chatId, messages }) => {
-    const chatsPinnedMessage = pinnedMessages.find(
-      (pin) => pin.chatId === chatId
-    );
-    console.log(chatsPinnedMessage);
-    if (chatsPinnedMessage) {
-      const message = messages?.find(
-        (message) => message.id === chatsPinnedMessage.messageId
-      );
-      console.log(message);
-      return message;
-    }
   };
 
   const pinMessage = ({ chatId, messageId }) => {
@@ -129,7 +116,9 @@ const DataProvider = ({ children }) => {
   const value = {
     chats,
     getSingleChat,
-    getPinnedMessage,
+    chatsError,
+    chatsLoading,
+    pinnedMessages,
     pinMessage,
     unpinMessage,
     isPinned,
@@ -137,6 +126,8 @@ const DataProvider = ({ children }) => {
     toggleTheme,
     profileInfoOpened,
     setProfileInfoOpened,
+    openInbox,
+    setOpenInbox,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -31,8 +31,6 @@ const Messages = ({ messages, chatCreator }) => {
     setMessageGroup(group);
   }, [messages]);
 
-  console.log(messageGroup);
-
   return (
     <div className="space-y-1.5 h-max w-full ">
       {Object.keys(messageGroup).map((date) => (

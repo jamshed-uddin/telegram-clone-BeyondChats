@@ -7,6 +7,7 @@ import Messages from "./Messages";
 import MessageInput from "./MessageInput";
 import InboxHeader from "./InboxHeader";
 import useData from "../hooks/useData";
+import InboxSkeleton from "./InboxSkeleton";
 
 const Inbox = () => {
   const { chatCreator, id } = useParams();
@@ -14,18 +15,27 @@ const Inbox = () => {
     getSingleChat,
     profileInfoOpened,
     setProfileInfoOpened,
-    getPinnedMessage,
+    pinnedMessages,
   } = useData();
   const [messages, setMessages] = useState([]);
   const [pinnedMessage, setPinnedMessage] = useState({});
-
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [messagesError, setMessageError] = useState("");
   useEffect(() => {
     const loadMessages = async () => {
-      const allMessages = await axios.get(
-        `https://devapi.beyondchats.com/api/get_chat_messages?chat_id=${id}`
-      );
+      try {
+        setMessagesLoading(true);
+        setMessageError("");
+        const allMessages = await axios.get(
+          `https://devapi.beyondchats.com/api/get_chat_messages?chat_id=${id}`
+        );
 
-      setMessages(allMessages?.data?.data);
+        setMessages(allMessages?.data?.data);
+        setMessagesLoading(false);
+      } catch (error) {
+        setMessageError("Something went wrong!");
+        setMessagesLoading(false);
+      }
     };
 
     loadMessages();
@@ -34,12 +44,11 @@ const Inbox = () => {
   const singleChat = getSingleChat(id);
 
   useEffect(() => {
-    const pinnedMessage = getPinnedMessage({ id, messages });
+    const pinnedMessage = pinnedMessages?.find((pin) => pin.chatId === id);
 
     setPinnedMessage(pinnedMessage);
-  }, [getPinnedMessage, id, messages]);
+  }, [id, messages, pinnedMessages]);
 
-  console.log(pinnedMessage);
   return (
     <div className="w-full h-full relative flex flex-col ">
       <div className="bg-gradient-to-br from-[#8DBA86] via-[#CDD58E] to-[#71A888] absolute inset-0 -z-20"></div>
@@ -53,7 +62,11 @@ const Inbox = () => {
       <div className="flex flex-grow   overflow-y-auto hide-scrollbar h-full w-full px-1">
         <div className="  px-2 lg:px-0 w-full lg:max-w-[30rem]  mx-auto  ">
           <div className="w-full">
-            <Messages messages={messages} />
+            {messagesLoading ? (
+              <InboxSkeleton />
+            ) : (
+              <Messages messages={messages} />
+            )}
           </div>
         </div>
       </div>
